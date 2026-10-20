@@ -1,0 +1,11 @@
+
+
+                           R1 	          	  - 			R2 (ISP) [크로스 or 시리얼 DCE, DTE] [Router]
+
+			   │						│
+			
+			  Sw1 (Switch)			       Svr1 (Server)
+
+	        vlan1│    │vlan2
+
+		       pc1  pc2

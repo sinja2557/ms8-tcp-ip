@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IT 명령어 타자연습</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+/* Layout: one column workbench. Shared selector bar on top, a dark terminal panel as the stage, stats as a strip above it. */
+:root{
+  --bg:#EDF1F5; --surface:#FFFFFF; --ink:#142235; --muted:#5A6A7E; --line:#D3DCE6;
+  --accent:#0D6C8A; --accent-soft:#DCEEF4; --accent-ink:#FFFFFF;
+  --warm:#C9731F; --ok:#1E8048; --bad:#C2372E; --bad-soft:#FBE2DF;
+  --term:#0F1A28; --term-2:#16243A; --term-fg:#D5E1EE; --term-dim:#5F7590; --term-ok:#9FE0B8; --term-bad:#FF8A80; --term-badbg:#5A1F22; --term-prompt:#7FC4DA; --term-caret:#F3B05A;
+  --font-ui:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-code:"JetBrains Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B111A; --surface:#121B27; --ink:#E2E9F1; --muted:#8D9BAF; --line:#24324A;
+  --accent:#43B3D3; --accent-soft:#16303C; --accent-ink:#04202B;
+  --warm:#EFA052; --ok:#5CC98A; --bad:#FF7B70; --bad-soft:#3A1C1C;
+  --term:#070C14; --term-2:#0F1828; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0B111A; --surface:#121B27; --ink:#E2E9F1; --muted:#8D9BAF; --line:#24324A;
+  --accent:#43B3D3; --accent-soft:#16303C; --accent-ink:#04202B;
+  --warm:#EFA052; --ok:#5CC98A; --bad:#FF7B70; --bad-soft:#3A1C1C;
+  --term:#070C14; --term-2:#0F1828; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.brand h1{font-size:1.55rem;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.brand h1 .mark{font-family:var(--font-code);font-size:.95rem;background:var(--ink);color:var(--bg);padding:2px 8px;border-radius:6px}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
+.tabs button{border:0;background:none;padding:7px 16px;border-radius:999px;cursor:pointer;font-weight:500;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+
+/* selector bar */
+.pick{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:12px}
+.pick-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.pick-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;color:var(--muted);width:44px;flex:none}
+.chip{border:1px solid var(--line);background:var(--bg);padding:6px 12px;border-radius:999px;cursor:pointer;font-size:.88rem;display:inline-flex;align-items:center;gap:7px}
+.chip .sw{width:9px;height:9px;border-radius:2px;flex:none}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip small{opacity:.7;font-variant-numeric:tabular-nums}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--bg);padding:6px 14px;cursor:pointer;font-size:.88rem;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg button em{font-style:normal;opacity:.65;font-size:.8em;margin-left:4px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.stat{background:var(--surface);padding:10px 14px;min-width:0}
+.stat b{display:block;font-family:var(--font-code);font-size:1.45rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:.75rem;color:var(--muted);letter-spacing:.04em}
+.stat.hl b{color:var(--accent)}
+@media (max-width:620px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat:nth-child(n+4){display:none}}
+
+/* terminal */
+.term{background:var(--term);color:var(--term-fg);border-radius:var(--r);overflow:hidden;font-family:var(--font-code);box-shadow:0 10px 30px -18px rgba(10,20,40,.6)}
+.term-bar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--term-2);font-size:.78rem;color:var(--term-dim)}
+.term-bar .dots{display:flex;gap:6px}
+.term-bar .dots i{width:10px;height:10px;border-radius:50%;background:#2B3B52;display:block}
+.term-bar .ttl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lv-tag{border:1px solid #2E4562;border-radius:4px;padding:1px 7px;color:var(--term-prompt)}
+.term-body{padding:16px 16px 6px;font-size:1.06rem;line-height:1.75;overflow-x:auto;min-height:120px}
+.tl{white-space:pre;display:flex;gap:0}
+.tl .pr{color:var(--term-prompt);flex:none;user-select:none}
+.tl.future{color:var(--term-dim)}
+.tl.done .tx{color:var(--term-dim)}
+.tl.done.err .tx{color:var(--term-fg)}
+.tx .c-ok{color:var(--term-ok)}
+.tx .c-bad{background:var(--term-badbg);color:var(--term-bad);border-radius:2px}
+.tx .c-cur{box-shadow:inset 0 -2px 0 var(--term-caret);color:#fff}
+.tx .c-pend{color:#B8C7D8}
+.tx .c-extra{background:var(--term-badbg);color:var(--term-bad);text-decoration:line-through}
+.done-mark{margin-left:10px;font-size:.8em;color:var(--term-ok)}
+.done-mark.x{color:var(--term-bad)}
+.term-input{display:flex;align-items:center;gap:0;padding:10px 16px 14px;border-top:1px dashed #22344D;margin-top:8px;font-size:1.06rem}
+.term-input .pr{color:var(--term-caret);white-space:pre;flex:none}
+.term-input input{flex:1;min-width:0;background:none;border:0;outline:none;color:#fff;font-family:var(--font-code);font-size:1.06rem;caret-color:var(--term-caret);padding:0}
+.term-input input::placeholder{color:var(--term-dim)}
+.term-foot{display:flex;flex-wrap:wrap;gap:6px 16px;padding:0 16px 12px;font-size:.74rem;color:var(--term-dim)}
+.term-foot kbd{border:1px solid #2E4562;border-radius:4px;padding:0 5px;font-family:var(--font-code);color:var(--term-fg)}
+
+.meaning{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.meaning .k{font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--accent);flex:none}
+.meaning p{margin:0;font-size:1rem}
+.ime{display:flex;gap:10px;align-items:center;background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:9px 12px;font-size:.9rem;font-weight:500}
+.ime kbd{font-family:var(--font-ui);border:1px solid currentColor;border-radius:4px;padding:0 6px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:500;font-size:.9rem}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:4px 10px;font-size:.82rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.next{display:flex;flex-direction:column;gap:6px}
+.next h3{font-size:.75rem;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.next ol{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.next li{font-family:var(--font-code);font-size:.82rem;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 9px;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* result */
+.result{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:18px}
+.result h2{font-size:1.25rem}
+.result-nums{display:flex;flex-wrap:wrap;gap:28px}
+.result-nums div b{display:block;font-family:var(--font-code);font-size:2.2rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.result-nums div span{font-size:.8rem;color:var(--muted)}
+.result-nums .new{color:var(--warm);font-size:.78rem;font-weight:700;margin-left:6px}
+.miss-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.miss-list li{border-left:3px solid var(--bad);padding:4px 0 4px 12px;min-width:0}
+.miss-list code{font-family:var(--font-code);font-size:.88rem;white-space:pre-wrap;word-break:break-all}
+.miss-list .you{color:var(--bad)}
+.miss-list .d{font-size:.82rem;color:var(--muted)}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:28px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:12px;align-items:center}
+
+/* rain */
+.rain-field{position:relative;height:min(62vh,480px);min-height:340px;background:
+  linear-gradient(180deg,var(--term) 0%,var(--term-2) 100%);border-radius:var(--r) var(--r) 0 0;overflow:hidden;font-family:var(--font-code)}
+.rain-field::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(127,196,218,.05) 1px,transparent 1px);background-size:100% 32px;pointer-events:none}
+.ground{position:absolute;left:0;right:0;bottom:0;height:30px;background:repeating-linear-gradient(90deg,#1E3047 0 22px,#18273B 22px 26px);border-top:2px solid var(--term-prompt);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--term-dim);letter-spacing:.2em;z-index:1}
+.rain-field.hit .ground{border-top-color:var(--term-bad);background:#3A1A20}
+.drop{position:absolute;left:0;top:0;white-space:nowrap;color:var(--term-fg);font-size:.95rem;padding:2px 7px;border-radius:4px;background:rgba(15,26,40,.75);border:1px solid #2A3E58;will-change:transform;z-index:2}
+.drop.gold{color:#1B1405;background:#F3C552;border-color:#F3C552;font-weight:700}
+.drop.ice{color:#04202B;background:#9FDCEF;border-color:#9FDCEF;font-weight:700}
+.drop.match{border-color:var(--term-caret);color:#fff}
+.drop.pop{transition:transform .25s ease,opacity .25s ease;opacity:0}
+.rain-input{display:flex;align-items:center;background:var(--term-2);border-radius:0 0 var(--r) var(--r);padding:10px 14px;font-family:var(--font-code);color:var(--term-fg)}
+.rain-input .pr{color:var(--term-caret);white-space:pre}
+.rain-input input{flex:1;min-width:0;background:none;border:0;outline:none;color:#fff;font-family:var(--font-code);font-size:1.05rem;caret-color:var(--term-caret)}
+.rain-input.shake{animation:shake .25s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(7,12,20,.78);color:var(--term-fg);z-index:5;text-align:center;padding:20px;font-family:var(--font-ui)}
+.overlay h2{font-size:1.6rem;color:#fff}
+.overlay p{margin:0;color:#A9BACD;max-width:44ch}
+.overlay .legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:.85rem}
+.overlay .legend span{display:inline-flex;gap:6px;align-items:center}
+.overlay .legend i{display:inline-block;width:12px;height:12px;border-radius:3px}
+.toast{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font-family:var(--font-ui);font-weight:700;font-size:1.5rem;color:var(--term-caret);z-index:4;pointer-events:none;animation:toast 1.1s ease forwards}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-30%)}20%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-80%)}}
+.lives{display:flex;gap:4px;align-items:center;height:1.75rem}
+.lives i{width:14px;height:20px;border-radius:3px;background:var(--ok);display:block}
+.lives i.off{background:var(--line)}
+.note{font-size:.84rem;color:var(--muted);margin:0}
+
+/* manage */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card h2{font-size:1.02rem}
+.card .sub{font-size:.84rem;color:var(--muted);margin:-6px 0 0}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:.78rem;font-weight:500;color:var(--muted)}
+.field input,.field select,.field textarea{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;width:100%}
+.field textarea{resize:vertical;min-height:70px}
+.mono{font-family:var(--font-code)!important;font-size:.9rem}
+.fields-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.msg{font-size:.84rem;color:var(--ok);min-height:1.2em;margin:0}
+.msg.err{color:var(--bad)}
+.cat-list,.term-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.cat-list li,.term-list li{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);min-width:0}
+.cat-list li:last-child,.term-list li:last-child{border-bottom:0}
+.cat-list .nm{flex:1;min-width:0}
+.cat-list .ct{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.term-list .body{flex:1;min-width:0}
+.term-list code{font-family:var(--font-code);font-size:.86rem;white-space:pre-wrap;word-break:break-all;display:block}
+.term-list .d{font-size:.8rem;color:var(--muted)}
+.lvb{font-size:.7rem;font-weight:700;border-radius:4px;padding:1px 6px;background:var(--accent-soft);color:var(--accent);flex:none}
+.tag-built{font-size:.7rem;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px}
+@media (prefers-reduced-motion: reduce){.toast,.rain-input.shake{animation:none}.drop.pop{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1><span class="mark">&gt;_</span>IT 명령어 타자연습</h1>
+      <p>배우는 명령어로 영타를 연습해요. 패킷 트레이서 · PowerShell · Ubuntu · Azure SQL · CMD</p>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="화면 선택">
+      <button role="tab" id="tab-practice" aria-selected="true" data-view="practice">연습하기</button>
+      <button role="tab" id="tab-rain" aria-selected="false" data-view="rain">산성비</button>
+      <button role="tab" id="tab-manage" aria-selected="false" data-view="manage">용어 관리</button>
+    </nav>
+  </header>
+
+  <section class="pick" id="pickBar" aria-label="분류와 난이도">
+    <div class="pick-row"><span class="pick-label">분류</span><div class="pick-row" id="catChips"></div></div>
+    <div class="pick-row"><span class="pick-label">난이도</span>
+      <div class="seg" id="lvSeg">
+        <button data-lv="1" aria-pressed="true">초급<em>단어</em></button>
+        <button data-lv="2" aria-pressed="false">중급<em>명령어</em></button>
+        <button data-lv="3" aria-pressed="false">고급<em>실전 조합</em></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section id="view-practice" class="wrap-inner" style="display:flex;flex-direction:column;gap:14px">
+    <div class="stats">
+      <div class="stat hl"><b id="sCpm">0</b><span>현재 타수 (타/분)</span></div>
+      <div class="stat"><b id="sAvg">0</b><span>평균 타수</span></div>
+      <div class="stat"><b id="sAcc">100%</b><span>정확도</span></div>
+      <div class="stat"><b id="sProg">0/0</b><span>진행</span></div>
+      <div class="stat"><b id="sBest">0</b><span>최고 평균 타수</span></div>
+    </div>
+
+    <div id="practiceStage">
+      <div class="term" id="term">
+        <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span class="ttl" id="termTitle"></span><span class="lv-tag" id="termLv"></span></div>
+        <div class="term-body" id="termBody" aria-live="polite"></div>
+        <label class="term-input" for="typeIn"><span class="pr" id="inPrompt"></span><input id="typeIn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="위 명령어를 똑같이 입력하고 Enter"></label>
+        <div class="term-foot"><span><kbd>Enter</kbd> 다음 줄</span><span><kbd>Esc</kbd> 건너뛰기</span><span>대소문자와 띄어쓰기까지 똑같이</span></div>
+      </div>
+    </div>
+    <div class="ime" id="imeWarn" hidden>한글로 입력되고 있어요. <kbd>한/영</kbd> 키를 눌러 영문으로 바꿔 주세요.</div>
+    <div class="meaning" id="meaningBox"><span class="k">뜻</span><p id="meaning"></p></div>
+    <div class="row">
+      <button class="btn" id="btnSkip">건너뛰기</button>
+      <button class="btn" id="btnRestart">새 문제로 다시 시작</button>
+      <label class="row" style="gap:6px;font-size:.88rem;color:var(--muted)"><input type="checkbox" id="optMeaning" checked> 뜻 보기</label>
+    </div>
+    <div class="next" id="nextBox"><h3>다음 문제</h3><ol id="nextList"></ol></div>
+  </section>
+
+  <!-- RAIN -->
+  <section id="view-rain" hidden style="flex-direction:column;gap:14px">
+    <div class="stats" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+      <div class="stat hl"><b id="rScore">0</b><span>점수</span></div>
+      <div class="stat"><b id="rLevel">1</b><span>레벨</span></div>
+      <div class="stat"><div class="lives" id="rLives"></div><span>생명</span></div>
+      <div class="stat"><b id="rBest">0</b><span>최고 점수</span></div>
+    </div>
+    <div>
+      <div class="rain-field" id="field">
+        <div class="ground">SERVER ROOM</div>
+        <div class="overlay" id="rainOverlay">
+          <h2 id="ovTitle">산성비</h2>
+          <p id="ovText">떨어지는 명령어를 바닥에 닿기 전에 입력하고 Enter를 누르세요. 바닥에 닿으면 생명이 하나 줄어요. 10개를 맞힐 때마다 빨라져요.</p>
+          <div class="legend"><span><i style="background:#F3C552"></i>노란 단어: 화면 전체 정리</span><span><i style="background:#9FDCEF"></i>하늘색 단어: 3초 멈춤</span></div>
+          <button class="btn pri" id="btnRain">시작하기</button>
+        </div>
+      </div>
+      <label class="rain-input" id="rainInputWrap" for="rainIn"><span class="pr">$ </span><input id="rainIn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="떨어지는 명령어 입력 후 Enter"></label>
+    </div>
+    <div class="ime" id="imeWarn2" hidden>한글로 입력되고 있어요. <kbd>한/영</kbd> 키를 눌러 영문으로 바꿔 주세요.</div>
+    <div class="row"><button class="btn" id="btnPause" disabled>일시정지</button><p class="note" id="rainNote"></p></div>
+  </section>
+
+  <!-- MANAGE -->
+  <section id="view-manage" hidden style="flex-direction:column;gap:16px">
+    <div class="grid2">
+      <div class="card">
+        <h2>용어 추가</h2>
+        <p class="sub">여러 줄로 쓰면 고급처럼 한 줄씩 차례로 입력하는 연습이 돼요.</p>
+        <div class="fields-2">
+          <div class="field"><label for="addCat">분류</label><select id="addCat"></select></div>
+          <div class="field"><label for="addLv">난이도</label><select id="addLv"><option value="1">초급 (단어)</option><option value="2">중급 (명령어)</option><option value="3">고급 (실전 조합)</option></select></div>
+        </div>
+        <div class="field"><label for="addText">명령어</label><textarea id="addText" class="mono" placeholder="예) docker ps -a"></textarea></div>
+        <div class="field"><label for="addDesc">뜻 (선택)</label><input id="addDesc" placeholder="예) 멈춘 것까지 모든 컨테이너 보기"></div>
+        <div class="row"><button class="btn pri" id="btnAdd">추가하기</button><p class="msg" id="addMsg"></p></div>
+      </div>
+
+      <div class="card">
+        <h2>한꺼번에 추가</h2>
+        <p class="sub">한 줄에 하나씩, <code class="mono">명령어 :: 뜻</code> 형식으로 붙여넣으세요. 뜻은 빼도 돼요.</p>
+        <div class="fields-2">
+          <div class="field"><label for="bulkCat">분류</label><select id="bulkCat"></select></div>
+          <div class="field"><label for="bulkLv">난이도</label><select id="bulkLv"><option value="1">초급 (단어)</option><option value="2" selected>중급 (명령어)</option><option value="3">고급 (실전 조합)</option></select></div>
+        </div>
+        <div class="field"><label for="bulkText">목록</label><textarea id="bulkText" class="mono" rows="5" placeholder="git status :: 변경된 파일 보기&#10;git add . :: 모든 변경 담기&#10;git commit -m &quot;first&quot; :: 커밋하기"></textarea></div>
+        <div class="row"><button class="btn pri" id="btnBulk">모두 추가</button><p class="msg" id="bulkMsg"></p></div>
+      </div>
+
+      <div class="card">
+        <h2>분류</h2>
+        <p class="sub">앞으로 배울 프로그램이 생기면 분류를 새로 만드세요.</p>
+        <div class="row" style="flex-wrap:nowrap"><div class="field" style="flex:1"><label for="newCat">새 분류 이름</label><input id="newCat" placeholder="예) Git, Docker, AWS CLI"></div><button class="btn pri" id="btnNewCat" style="align-self:flex-end">만들기</button></div>
+        <p class="msg" id="catMsg"></p>
+        <ul class="cat-list" id="catList"></ul>
+      </div>
+
+      <div class="card">
+        <h2>백업과 옮기기</h2>
+        <p class="sub">내가 넣은 용어는 이 브라우저에만 저장돼요. 다른 컴퓨터로 옮기려면 내보낸 글을 복사해 두었다가 거기서 붙여넣고 가져오세요.</p>
+        <div class="field"><label for="backupText">백업 내용</label><textarea id="backupText" class="mono" rows="4" placeholder="내보내기를 누르면 여기에 나타나요. 가져올 때는 여기에 붙여넣으세요."></textarea></div>
+        <div class="row"><button class="btn" id="btnExport">내보내기 + 복사</button><button class="btn" id="btnImport">가져오기</button><p class="msg" id="backupMsg"></p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between"><h2>내가 넣은 용어</h2>
+        <div class="field" style="flex-direction:row;align-items:center;gap:8px"><label for="listFilter">분류</label><select id="listFilter" style="width:auto"></select></div></div>
+      <ul class="term-list" id="termList"></ul>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ---------- built-in word sets ----------
+   Format: "명령어 → 뜻". In 고급, " ⏎ " separates lines typed one after another. */
+const BUILTIN = [
+{ id:'ios', name:'Packet Tracer (IOS)', color:'#1BA0D7', raw:String.raw`
+#초급
+enable → 특권 모드(#)로 들어가기
+disable → 사용자 모드(>)로 돌아가기
+exit → 한 단계 위 모드로 나가기
+end → 어디서든 특권 모드로 바로 돌아가기
+show → 설정과 상태 보기
+ping → 상대 장비와 연결되는지 확인
+traceroute → 목적지까지 거치는 경로 추적
+hostname → 장비 이름 정하기
+interface → 인터페이스(포트) 설정 모드로 들어가기
+shutdown → 인터페이스 끄기
+reload → 장비 다시 시작
+vlan → VLAN 만들기
+router → 라우팅 프로토콜 설정 시작
+banner → 접속할 때 보이는 안내 문구
+description → 인터페이스에 설명 달기
+switchport → 스위치 포트 설정
+password → 비밀번호 지정
+login → 접속할 때 비밀번호 확인 켜기
+trunk → 여러 VLAN을 함께 실어 나르는 포트 방식
+access → VLAN 하나에만 속하는 포트 방식
+#중급
+configure terminal → 전역 설정 모드로 들어가기
+show running-config → 지금 적용 중인 설정 보기
+show startup-config → 저장된 설정 보기
+show ip interface brief → 인터페이스 IP와 상태를 한눈에 보기
+show ip route → 라우팅 테이블 보기
+show vlan brief → VLAN 목록과 소속 포트 보기
+show mac address-table → 스위치가 배운 MAC 주소 보기
+show cdp neighbors → 바로 연결된 시스코 장비 보기
+copy running-config startup-config → 현재 설정을 저장하기
+write memory → 현재 설정을 저장하기 (짧은 방법)
+ip address 192.168.1.1 255.255.255.0 → 인터페이스에 IP 주소 넣기
+no shutdown → 인터페이스 켜기
+interface gigabitEthernet 0/0 → 기가비트 포트 0/0 설정하기
+interface range fastEthernet 0/1 - 10 → 포트 여러 개를 한 번에 설정하기
+switchport mode access → 포트를 액세스 모드로
+switchport access vlan 10 → 포트를 VLAN 10에 넣기
+switchport mode trunk → 포트를 트렁크 모드로
+ip route 0.0.0.0 0.0.0.0 192.168.1.254 → 기본 경로(디폴트 라우트) 설정
+enable secret cisco123 → 특권 모드 비밀번호를 암호화해서 설정
+line console 0 → 콘솔 포트 설정 모드
+line vty 0 4 → 원격 접속(텔넷/SSH) 회선 설정 모드
+service password-encryption → 설정 파일 속 비밀번호 숨기기
+no ip domain-lookup → 오타를 도메인으로 착각해 기다리는 것 끄기
+router ospf 1 → OSPF 라우팅 시작 (프로세스 번호 1)
+ping 192.168.1.10 → 해당 IP로 연결 확인
+#고급
+enable ⏎ configure terminal ⏎ interface gigabitEthernet 0/0 ⏎ ip address 192.168.1.1 255.255.255.0 ⏎ no shutdown ⏎ end → 라우터 포트에 IP를 주고 켜기
+configure terminal ⏎ vlan 10 ⏎ name SALES ⏎ exit ⏎ interface fastEthernet 0/1 ⏎ switchport mode access ⏎ switchport access vlan 10 ⏎ end → VLAN 10을 만들고 1번 포트를 넣기
+configure terminal ⏎ line console 0 ⏎ password cisco ⏎ login ⏎ end → 콘솔 접속에 비밀번호 걸기
+configure terminal ⏎ line vty 0 4 ⏎ password cisco ⏎ login ⏎ transport input telnet ⏎ end → 텔넷 원격 접속 허용하기
+configure terminal ⏎ ip route 0.0.0.0 0.0.0.0 203.0.113.1 ⏎ end ⏎ copy running-config startup-config → 기본 경로를 설정하고 저장하기
+configure terminal ⏎ router ospf 1 ⏎ network 192.168.1.0 0.0.0.255 area 0 ⏎ network 10.0.0.0 0.0.0.3 area 0 ⏎ end → OSPF로 두 네트워크를 이웃에게 알리기
+configure terminal ⏎ ip dhcp excluded-address 192.168.1.1 192.168.1.10 ⏎ ip dhcp pool LAN ⏎ network 192.168.1.0 255.255.255.0 ⏎ default-router 192.168.1.1 ⏎ dns-server 8.8.8.8 ⏎ end → 라우터를 DHCP 서버로 만들기 (.1~.10은 빼고 나눠줌)
+configure terminal ⏎ interface gigabitEthernet 0/0.10 ⏎ encapsulation dot1Q 10 ⏎ ip address 192.168.10.1 255.255.255.0 ⏎ end → 서브인터페이스로 VLAN 10 라우팅 (Router-on-a-stick)
+configure terminal ⏎ hostname R1 ⏎ ip domain-name lab.local ⏎ crypto key generate rsa ⏎ username admin secret cisco123 ⏎ line vty 0 4 ⏎ login local ⏎ transport input ssh ⏎ end → SSH 원격 접속 설정 (실제 장비에선 키 길이를 물으면 1024 입력)
+`},
+{ id:'ps', name:'PowerShell', color:'#3B6CC4', raw:String.raw`
+#초급
+Get-Help → 명령어 도움말 보기
+Get-Command → 쓸 수 있는 명령어 찾기
+Get-Process → 실행 중인 프로그램(프로세스) 보기
+Get-Service → 서비스 목록 보기
+Get-ChildItem → 폴더 안 파일 목록 (dir, ls와 같음)
+Set-Location → 폴더 이동 (cd와 같음)
+Get-Location → 현재 폴더 위치 보기
+Get-Content → 파일 내용 읽기
+New-Item → 파일이나 폴더 만들기
+Copy-Item → 복사하기
+Move-Item → 옮기기
+Remove-Item → 지우기
+Rename-Item → 이름 바꾸기
+Clear-Host → 화면 지우기
+Get-Date → 현재 날짜와 시간
+Stop-Process → 프로세스 끝내기
+Test-Connection → 핑으로 연결 확인
+Select-Object → 원하는 속성만 고르기
+Where-Object → 조건에 맞는 것만 거르기
+Sort-Object → 정렬하기
+#중급
+Get-ChildItem -Path C:\Users → C:\Users 폴더 목록 보기
+Get-Service -Name Spooler → 인쇄 서비스 상태 보기
+Restart-Service -Name Spooler → 인쇄 서비스 다시 시작 (관리자 권한)
+Get-Help Get-Process -Examples → 사용 예제와 함께 도움말 보기
+Test-Connection 8.8.8.8 -Count 4 → 8.8.8.8로 핑 4번 보내기
+Test-NetConnection google.com -Port 443 → 443번 포트가 열려 있는지 확인
+Resolve-DnsName google.com → 도메인의 IP 주소 찾기
+Get-NetIPConfiguration → IP 설정 보기 (ipconfig와 비슷)
+Get-NetIPAddress -AddressFamily IPv4 → IPv4 주소만 보기
+New-Item -ItemType Directory -Name Logs → Logs 폴더 만들기
+Copy-Item .\report.txt -Destination D:\Backup → 파일을 D:\Backup으로 복사
+Get-Content .\log.txt -Tail 20 → 파일 마지막 20줄 보기
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser → 내 계정에서 스크립트 실행 허용
+Get-LocalUser → 이 컴퓨터의 사용자 계정 목록
+Get-WinEvent -LogName System -MaxEvents 10 → 시스템 이벤트 로그 최근 10개
+Stop-Process -Name notepad → 메모장 끄기
+#고급
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 5 → CPU를 가장 많이 쓴 프로세스 5개
+Get-Service | Where-Object Status -eq 'Running' → 실행 중인 서비스만 보기
+Get-ChildItem C:\Logs -Filter *.log | Remove-Item -WhatIf → 로그 파일 지우기 미리보기 (-WhatIf라서 실제로는 안 지움)
+Get-ChildItem -Recurse -File | Measure-Object -Property Length -Sum → 하위 폴더까지 파일 크기 합계
+Get-Service | Export-Csv -Path .\services.csv -NoTypeInformation → 서비스 목록을 CSV 파일로 저장
+Get-Content .\servers.txt | ForEach-Object { Test-Connection $_ -Count 1 -Quiet } → 목록 파일에 적힌 서버마다 핑 확인
+Get-NetTCPConnection -State Listen | Sort-Object LocalPort → 열려서 접속을 기다리는 포트 보기
+Get-LocalUser | Where-Object Enabled | Select-Object Name, LastLogon → 사용 중인 계정과 마지막 로그인
+Get-WinEvent -LogName System -MaxEvents 50 | Where-Object Level -eq 2 → 최근 시스템 로그 50개 중 오류만
+New-Item -Path .\Backup -ItemType Directory; Copy-Item .\*.docx .\Backup → 백업 폴더를 만들고 워드 파일 복사
+Get-Process | Where-Object WorkingSet -gt 500MB → 메모리를 500MB 넘게 쓰는 프로세스
+Get-ChildItem *.txt | Rename-Item -NewName { $_.Name -replace '\.txt$','.bak' } → 모든 .txt 파일의 확장자를 .bak으로 바꾸기
+`},
+{ id:'ubuntu', name:'Ubuntu (Linux)', color:'#E95420', raw:String.raw`
+#초급
+ls → 파일 목록 보기
+cd → 폴더 이동
+pwd → 현재 위치 보기
+mkdir → 폴더 만들기
+rm → 파일 지우기
+cp → 복사하기
+mv → 옮기기 또는 이름 바꾸기
+cat → 파일 내용 출력
+touch → 빈 파일 만들기
+sudo → 관리자 권한으로 실행
+apt → 프로그램 설치와 관리
+nano → 간단한 글 편집기
+chmod → 권한 바꾸기
+chown → 소유자 바꾸기
+grep → 글자 찾기
+man → 명령어 설명서
+whoami → 지금 사용자 이름
+history → 입력했던 명령 기록
+tail → 파일 끝부분 보기
+clear → 화면 지우기
+#중급
+ls -la → 숨김 파일까지 자세히 보기
+cd /var/log → 로그 폴더로 이동
+cd .. → 상위 폴더로 이동
+sudo apt update → 설치 가능한 패키지 목록 새로고침
+sudo apt install nginx → nginx 웹서버 설치
+mkdir -p projects/web → 중간 폴더까지 한 번에 만들기
+rm -r old_folder → 폴더째 지우기
+cp file.txt backup/ → 파일을 backup 폴더로 복사
+chmod 755 script.sh → 주인은 모든 권한, 나머지는 읽기와 실행
+ip addr show → IP 주소 보기
+ping -c 4 8.8.8.8 → 핑 4번만 보내기
+df -h → 디스크 남은 용량 보기
+free -h → 메모리 사용량 보기
+tail -f /var/log/syslog → 로그를 실시간으로 계속 보기 (Ctrl+C로 중지)
+sudo systemctl status ssh → SSH 서비스 상태 보기
+sudo systemctl restart nginx → nginx 다시 시작
+grep -i error app.log → 대소문자 상관없이 error 찾기
+ps aux → 실행 중인 모든 프로세스 보기
+sudo ufw allow 22/tcp → 방화벽에서 22번(SSH) 포트 열기
+ssh user@192.168.1.10 → 다른 서버에 원격 접속
+tar -czvf backup.tar.gz docs/ → docs 폴더를 압축 파일로 묶기
+#고급
+sudo apt update && sudo apt upgrade -y → 패키지 목록을 갱신하고 전부 업그레이드
+ps aux | grep nginx → nginx 프로세스만 찾기
+grep -i error /var/log/syslog | tail -n 20 → 시스템 로그의 오류 중 최근 20줄
+du -sh * | sort -h → 폴더별 용량을 작은 순서로
+sudo systemctl enable --now nginx → nginx를 지금 켜고 부팅할 때도 자동 실행
+find . -name "*.log" -mtime +7 -delete → 7일 지난 .log 파일 지우기
+history | grep ssh → 예전에 썼던 ssh 명령 찾기
+ls -l | wc -l → 목록이 몇 줄인지 세기
+sudo ufw allow 80/tcp && sudo ufw enable → 80번 포트를 열고 방화벽 켜기
+mkdir -p ~/backup && cp *.conf ~/backup/ → 백업 폴더를 만들고 설정 파일 복사
+ip -4 addr show | grep inet → IPv4 주소 줄만 보기
+sudo journalctl -u ssh --since today → 오늘 SSH 서비스 로그 보기
+ss -tuln | grep :22 → 22번 포트가 열려 있는지 확인
+chmod +x deploy.sh && ./deploy.sh → 스크립트에 실행 권한을 주고 실행
+cat /etc/os-release | grep VERSION → 우분투 버전 확인
+`},
+{ id:'sql', name:'Azure SQL', color:'#0078D4', raw:String.raw`
+#초급
+SELECT → 데이터 조회
+FROM → 어느 테이블에서
+WHERE → 조건 걸기
+INSERT → 데이터 넣기
+UPDATE → 데이터 고치기
+DELETE → 데이터 지우기
+CREATE → 새로 만들기
+TABLE → 표(테이블)
+DROP → 통째로 없애기
+ALTER → 구조 바꾸기
+JOIN → 테이블 합쳐 보기
+ORDER BY → 정렬
+GROUP BY → 묶어서 집계
+COUNT → 개수 세기
+DISTINCT → 중복 빼기
+TOP → 위에서 몇 개만
+NULL → 값이 없음
+PRIMARY KEY → 행을 구분하는 기본 키
+NVARCHAR → 한글도 저장되는 문자열 형식
+INT → 정수 형식
+#중급
+SELECT * FROM Customers; → 고객 테이블 전체 조회
+SELECT TOP 10 * FROM Orders; → 주문 10개만 조회
+SELECT Name, Email FROM Users; → 이름과 이메일만 조회
+SELECT COUNT(*) FROM Products; → 상품 개수 세기
+SELECT DISTINCT City FROM Customers; → 고객 도시 목록 (중복 없이)
+SELECT GETDATE(); → 서버의 현재 시간
+SELECT @@VERSION; → SQL 버전 정보
+SELECT name FROM sys.tables; → 데이터베이스의 테이블 목록
+EXEC sp_help 'Customers'; → 테이블 구조 보기
+DELETE FROM Logs WHERE Id = 5; → Id가 5인 행 지우기
+UPDATE Products SET Price = 1000 WHERE Id = 1; → 1번 상품 가격 바꾸기
+INSERT INTO Users (Name) VALUES (N'Kim'); → 사용자 한 명 넣기
+TRUNCATE TABLE Logs; → 테이블 내용만 전부 비우기
+DROP TABLE TempData; → 테이블 통째로 삭제
+CREATE DATABASE ShopDB; → 새 데이터베이스 만들기 (master에서 실행)
+#고급
+CREATE TABLE Users (Id INT IDENTITY(1,1) PRIMARY KEY, Name NVARCHAR(50) NOT NULL); → 번호가 자동으로 늘어나는 테이블 만들기
+SELECT Name, Price FROM Products WHERE Price > 10000 ORDER BY Price DESC; → 만 원 넘는 상품을 비싼 순으로
+SELECT City, COUNT(*) AS Total FROM Customers GROUP BY City HAVING COUNT(*) > 5; → 고객이 5명 넘는 도시
+SELECT o.Id, c.Name FROM Orders o JOIN Customers c ON o.CustomerId = c.Id; → 주문과 고객 이름 같이 보기
+INSERT INTO Products (Name, Price) VALUES (N'Keyboard', 35000); → 상품 하나 추가
+UPDATE Users SET IsActive = 0 WHERE LastLogin < '2025-01-01'; → 오래 안 들어온 사용자 비활성화
+ALTER TABLE Users ADD Phone VARCHAR(20) NULL; → 전화번호 열 추가
+CREATE INDEX IX_Orders_CustomerId ON Orders (CustomerId); → 검색이 빨라지도록 인덱스 만들기
+SELECT TOP 5 Name, CreatedAt FROM Products ORDER BY CreatedAt DESC; → 최근 등록된 상품 5개
+CREATE USER appuser WITH PASSWORD = 'Str0ng!Pass2026'; → 이 DB 전용 사용자 만들기 (Azure SQL 포함 사용자)
+ALTER ROLE db_datareader ADD MEMBER appuser; → 그 사용자에게 읽기 권한 주기
+BEGIN TRAN; DELETE FROM Logs WHERE CreatedAt < '2024-01-01'; ROLLBACK; → 지우기를 시험해 보고 되돌리기
+SELECT * FROM Orders WHERE OrderDate >= DATEADD(day, -7, GETDATE()); → 최근 7일 주문
+`},
+{ id:'cmd', name:'CMD', color:'#7A8796', raw:String.raw`
+#초급
+dir → 파일 목록 보기
+cd → 폴더 이동
+cls → 화면 지우기
+copy → 복사
+del → 파일 지우기
+mkdir → 폴더 만들기
+rmdir → 폴더 지우기
+move → 옮기기
+ren → 이름 바꾸기
+type → 파일 내용 보기
+echo → 글자 출력
+ipconfig → IP 설정 보기
+ping → 연결 확인
+tracert → 경로 추적
+nslookup → 도메인의 IP 찾기
+netstat → 네트워크 연결 상태
+tasklist → 실행 중인 프로그램 목록
+taskkill → 프로그램 강제 종료
+hostname → 컴퓨터 이름
+systeminfo → 시스템 정보
+#중급
+ipconfig /all → 자세한 IP 설정 (MAC 주소 포함)
+ipconfig /flushdns → DNS 캐시 비우기
+ipconfig /release → IP 반납
+ipconfig /renew → IP 다시 받기
+ping -n 4 8.8.8.8 → 핑 4번 보내기
+ping 8.8.8.8 -t → 멈출 때까지 계속 핑 (Ctrl+C로 중지)
+tracert google.com → 구글까지 경로 추적
+nslookup naver.com → 네이버 IP 주소 찾기
+netstat -ano → 모든 연결과 프로세스 번호(PID)
+dir /s /b → 하위 폴더까지 파일 경로만 보기
+cd C:\Windows\System32 → 시스템 폴더로 이동
+mkdir C:\Backup → 백업 폴더 만들기
+copy report.txt D:\Backup → 파일을 D:\Backup으로 복사
+del /q *.tmp → 묻지 않고 .tmp 파일 지우기
+taskkill /im notepad.exe /f → 메모장 강제 종료
+shutdown /r /t 0 → 바로 재시작
+sfc /scannow → 시스템 파일 검사 (관리자 권한)
+whoami /all → 내 계정 정보와 권한
+net user → 사용자 계정 목록
+gpupdate /force → 그룹 정책 바로 적용
+#고급
+ipconfig /all | findstr IPv4 → IPv4 주소 줄만 보기
+netstat -ano | findstr :80 → 80번 포트를 쓰는 연결 찾기
+tasklist | findstr chrome → 크롬 프로세스만 보기
+ipconfig /release && ipconfig /renew → IP를 반납하고 다시 받기
+dir /s /b *.log > loglist.txt → 로그 파일 목록을 파일로 저장
+robocopy C:\Data D:\Backup /E /R:2 /W:5 → 하위 폴더까지 백업 (실패하면 5초 쉬고 2번 재시도)
+ping -n 1 192.168.0.1 | find "TTL=" >nul && echo OK || echo FAIL → 게이트웨이가 응답하는지 OK/FAIL로만 보기
+systeminfo | findstr /B /C:"OS" → 운영체제 이름과 버전만 보기
+mkdir C:\Logs && copy *.log C:\Logs → 폴더를 만들고 로그 파일 복사
+for %f in (*.txt) do type %f → 모든 .txt 파일 내용을 차례로 보기
+netsh interface ip show config → 인터페이스별 IP 설정 보기
+netsh advfirewall set allprofiles state on → 모든 방화벽 프로필 켜기 (관리자 권한)
+tasklist /fi "imagename eq chrome.exe" → 이름으로 프로세스 거르기
+echo %USERNAME% @ %COMPUTERNAME% → 사용자 이름과 컴퓨터 이름 출력
+`}
+];
+const PROMPTS = { ps:'PS C:\\Users\\student> ', ubuntu:'student@ubuntu:~$ ', sql:'1> ', cmd:'C:\\Users\\student>' };
+const LV_NAME = {1:'초급',2:'중급',3:'고급'};
+const CUSTOM_COLORS = ['#2E9E7A','#A35BC4','#C9731F','#D04F7A','#5B8F2E','#4A6FB0'];
+
+function parseRaw(raw){
+  const out=[]; let lv=1;
+  raw.split('\n').forEach(line=>{
+    line=line.trim(); if(!line) return;
+    if(line==='#초급'){lv=1;return} if(line==='#중급'){lv=2;return} if(line==='#고급'){lv=3;return}
+    const i=line.lastIndexOf(' → ');
+    const t=(i>=0?line.slice(0,i):line).split(' ⏎ ').map(s=>s.trim()).join('\n');
+    out.push({t, d:i>=0?line.slice(i+3).trim():'', lv});
+  });
+  return out;
+}
+BUILTIN.forEach(c=>{c.items=parseRaw(c.raw).map(x=>({...x,cat:c.id}));c.builtin=true});
+
+/* ---------- storage ---------- */
+const store={
+  get(k,d){try{const v=localStorage.getItem('ittyper.'+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('ittyper.'+k,JSON.stringify(v))}catch(e){}}
+};
+let custom=store.get('custom',{cats:[],items:[]});
+if(!custom||!Array.isArray(custom.cats)||!Array.isArray(custom.items)) custom={cats:[],items:[]};
+let settings=store.get('settings',{cat:'ios',lv:1,meaning:true});
+let best=store.get('best',{cpm:0,rain:0});
+const saveCustom=()=>store.set('custom',custom);
+const saveSettings=()=>store.set('settings',settings);
+const saveBest=()=>store.set('best',best);
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const hasHangul=s=>/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(s);
+
+function allCats(){
+  return [...BUILTIN, ...custom.cats.map((c,i)=>({...c,color:c.color||CUSTOM_COLORS[i%CUSTOM_COLORS.length],builtin:false}))];
+}
+function catById(id){return allCats().find(c=>c.id===id)}
+function itemsOf(catId){
+  const b=BUILTIN.find(c=>c.id===catId);
+  const base=b?b.items:[];
+  return [...base, ...custom.items.filter(x=>x.cat===catId)];
+}
+function pool(catId,lv){
+  const ids=catId==='all'?allCats().map(c=>c.id):[catId];
+  return ids.flatMap(id=>itemsOf(id)).filter(x=>x.lv===lv);
+}
+
+/* ---------- Cisco IOS prompt simulation ---------- */
+const MODE_SUFFIX={user:'>',priv:'#',config:'(config)#',if:'(config-if)#',ifrange:'(config-if-range)#',subif:'(config-subif)#',line:'(config-line)#',router:'(config-router)#',vlan:'(config-vlan)#',dhcp:'(dhcp-config)#'};
+function iosStart(l){
+  const w=l.split(/\s+/)[0];
+  if(l==='enable') return 'user';
+  if(['show','copy','write','ping','traceroute','reload','configure','debug','disable','telnet','ssh','clock'].includes(w)) return 'priv';
+  if(/^(ip address|no shutdown|shutdown|switchport|description|duplex|speed|encapsulation|trunk|access)/.test(l)) return 'if';
+  if(/^(password|login|transport)/.test(l)) return 'line';
+  if(/^network .* area/.test(l)) return 'router';
+  if(/^(default-router|dns-server)/.test(l)) return 'dhcp';
+  if(/^name /.test(l)) return 'vlan';
+  return 'config';
+}
+function iosNext(mode,l){
+  if(l==='enable') return 'priv';
+  if(l==='disable') return 'user';
+  if(/^conf(igure)?\s+t(erminal)?$/.test(l)) return 'config';
+  if(l==='end') return 'priv';
+  if(l==='exit') return mode==='config'?'priv':(mode==='priv'||mode==='user')?mode:'config';
+  if(/^interface\s+range/.test(l)) return 'ifrange';
+  if(/^interface\s+\S+\s*\S*\.\d+$/.test(l)) return 'subif';
+  if(/^interface\s/.test(l)) return 'if';
+  if(/^line\s/.test(l)) return 'line';
+  if(/^router\s/.test(l)) return 'router';
+  if(/^vlan\s+\d+$/.test(l)) return 'vlan';
+  if(/^ip dhcp pool/.test(l)) return 'dhcp';
+  return mode;
+}
+function promptsFor(catId,lines){
+  if(catId!=='ios') return lines.map(()=>PROMPTS[catId]||'> ');
+  let host=/switchport|vlan|fastEthernet|mac address-table/.test(lines.join(' '))?'Switch':'Router';
+  let mode=iosStart(lines[0]);
+  return lines.map(l=>{
+    const p=host+MODE_SUFFIX[mode];
+    mode=iosNext(mode,l);
+    const m=l.match(/^hostname\s+(\S+)/); if(m) host=m[1];
+    return p;
+  });
+}
+
+/* ---------- selector bar ---------- */
+function renderChips(){
+  const cats=allCats();
+  if(settings.cat!=='all'&&!cats.find(c=>c.id===settings.cat)) settings.cat='ios';
+  const chips=[{id:'all',name:'전체 섞기',color:null},...cats];
+  $('#catChips').innerHTML=chips.map(c=>{
+    const n=c.id==='all'?pool('all',settings.lv).length:itemsOf(c.id).filter(x=>x.lv===settings.lv).length;
+    return `<button class="chip" data-cat="${esc(c.id)}" aria-pressed="${settings.cat===c.id}">${c.color?`<span class="sw" style="background:${esc(c.color)}"></span>`:''}${esc(c.name)} <small>${n}</small></button>`;
+  }).join('');
+  document.querySelectorAll('#lvSeg button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.lv===settings.lv)));
+}
+$('#catChips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b) return;
+  settings.cat=b.dataset.cat; saveSettings(); renderChips(); onSelectionChange();
+});
+$('#lvSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  settings.lv=+b.dataset.lv; saveSettings(); renderChips(); onSelectionChange();
+});
+function onSelectionChange(){
+  if(view==='practice') newRound(); else if(view==='rain'){ rainStop(true); updateRainNote(); }
+}
+
+/* ---------- practice ---------- */
+const ROUND_LEN=10;
+let R=null; // round state
+let lineStart=0, liveTimer=null;
+
+function newRound(items){
+  const p=items||shuffle(pool(settings.cat,settings.lv)).slice(0,ROUND_LEN);
+  R={items:p,idx:0,line:0,typed:[],correct:0,chars:0,time:0,misses:[],itemErr:false};
+  lineStart=0; stopLive();
+  renderPractice();
+}
+function curItem(){return R&&R.items[R.idx]}
+function curLines(){const it=curItem();return it?it.t.split('\n'):[]}
+
+function renderPractice(){
+  const stage=$('#practiceStage');
+  $('#sBest').textContent=best.cpm;
+  if(!R.items.length){
+    const cat=settings.cat==='all'?'전체':(catById(settings.cat)||{}).name;
+    stage.innerHTML=`<div class="empty"><strong>${esc(cat)}의 ${LV_NAME[settings.lv]} 용어가 아직 없어요.</strong><span>용어 관리에서 이 난이도로 추가하면 바로 연습할 수 있어요.</span><button class="btn pri" data-goto="manage">용어 추가하러 가기</button></div>`;
+    $('#meaningBox').hidden=true; $('#nextBox').hidden=true; updateStats(); return;
+  }
+  if(R.idx>=R.items.length){ renderResult(); return; }
+  if(!$('#term')) stage.innerHTML=TERM_HTML;
+  const it=curItem(), lines=curLines(), prompts=promptsFor(it.cat,lines);
+  const c=catById(it.cat);
+  $('#termTitle').textContent=`${c?c.name:''}  ·  ${R.idx+1}번째 문제`;
+  $('#termLv').textContent=LV_NAME[it.lv]+(lines.length>1?` · ${lines.length}줄`:'');
+  $('#inPrompt').textContent=prompts[R.line];
+  renderLines();
+  $('#meaningBox').hidden=!settings.meaning;
+  $('#meaning').textContent=it.d||'뜻이 아직 적혀 있지 않아요.';
+  const nx=R.items.slice(R.idx+1,R.idx+5);
+  $('#nextBox').hidden=!nx.length;
+  $('#nextList').innerHTML=nx.map(x=>`<li>${esc(x.t.split('\n')[0])}${x.t.includes('\n')?' …':''}</li>`).join('');
+  updateStats();
+  bindTypeIn();
+}
+const TERM_HTML=document.getElementById('practiceStage').innerHTML;
+
+function charSpans(target,typed,showCaret){
+  let h='';
+  const n=Math.max(target.length,typed.length);
+  for(let i=0;i<n;i++){
+    const t=target[i], y=typed[i];
+    if(t===undefined){h+=`<span class="c-extra">${esc(y)}</span>`;continue}
+    if(y===undefined){h+=`<span class="${showCaret&&i===typed.length?'c-cur':'c-pend'}">${esc(t)}</span>`;continue}
+    h+=`<span class="${y===t?'c-ok':'c-bad'}">${esc(t)}</span>`;
+  }
+  if(showCaret&&typed.length>=target.length) h+=`<span class="c-cur"> </span>`;
+  return h;
+}
+function renderLines(){
+  const it=curItem(), lines=curLines(), prompts=promptsFor(it.cat,lines);
+  const live=($('#typeIn')||{}).value||'';
+  $('#termBody').innerHTML=lines.map((l,i)=>{
+    if(i<R.line){
+      const y=R.typed[i]; const ok=y===l;
+      return `<div class="tl done ${ok?'':'err'}"><span class="pr">${esc(prompts[i])}</span><span class="tx">${ok?esc(l):charSpans(l,y,false)}</span><span class="done-mark ${ok?'':'x'}">${ok?'✓':'✗'}</span></div>`;
+    }
+    if(i===R.line) return `<div class="tl cur"><span class="pr">${esc(prompts[i])}</span><span class="tx">${charSpans(l,live,true)}</span></div>`;
+    return `<div class="tl future"><span class="pr">${esc(prompts[i])}</span><span class="tx">${esc(l)}</span></div>`;
+  }).join('');
+}
+function countCorrect(target,typed){let c=0;for(let i=0;i<Math.min(target.length,typed.length);i++) if(target[i]===typed[i]) c++;return c}
+
+function bindTypeIn(){
+  const inp=$('#typeIn'); if(!inp||inp.dataset.bound) return;
+  inp.dataset.bound='1';
+  inp.addEventListener('input',()=>{
+    $('#imeWarn').hidden=!hasHangul(inp.value);
+    if(inp.value&&!lineStart){lineStart=performance.now();startLive()}
+    renderLines(); updateLive();
+  });
+  inp.addEventListener('keydown',e=>{
+    if(e.isComposing) return;
+    if(e.key==='Enter'){e.preventDefault(); submitLine()}
+    else if(e.key==='Escape'){e.preventDefault(); skipItem()}
+  });
+}
+function submitLine(){
+  const inp=$('#typeIn'); if(!R||R.idx>=R.items.length) return;
+  const typed=inp.value; if(!typed.trim()) return;
+  const target=curLines()[R.line];
+  const el=lineStart?(performance.now()-lineStart)/1000:0;
+  R.correct+=countCorrect(target,typed);
+  R.chars+=Math.max(target.length,typed.length);
+  R.time+=el;
+  if(typed!==target) R.itemErr=true;
+  R.typed[R.line]=typed;
+  lineStart=0; stopLive(); inp.value=''; $('#imeWarn').hidden=true;
+  if(R.line<curLines().length-1){R.line++; renderPractice(); return}
+  if(R.itemErr) R.misses.push({item:curItem(),typed:R.typed.slice()});
+  nextItem();
+}
+function nextItem(){R.idx++; R.line=0; R.typed=[]; R.itemErr=false; renderPractice(); focusTyping()}
+function skipItem(){
+  if(!R||R.idx>=R.items.length) return;
+  R.misses.push({item:curItem(),typed:[...R.typed,'(건너뜀)'],skipped:true});
+  const inp=$('#typeIn'); if(inp) inp.value='';
+  lineStart=0; stopLive(); nextItem();
+}
+function cpm(correct,sec){return sec>0.4?Math.round(correct/sec*60):0}
+function startLive(){stopLive(); liveTimer=setInterval(updateLive,250)}
+function stopLive(){if(liveTimer){clearInterval(liveTimer);liveTimer=null}}
+function updateLive(){
+  const inp=$('#typeIn'); if(!inp||!R||R.idx>=R.items.length) return;
+  const target=curLines()[R.line]||'';
+  const sec=lineStart?(performance.now()-lineStart)/1000:0;
+  const c=countCorrect(target,inp.value);
+  $('#sCpm').textContent=cpm(c,sec);
+  const totC=R.correct+c, totN=R.chars+inp.value.length;
+  $('#sAcc').textContent=(totN?Math.round(totC/totN*100):100)+'%';
+}
+function updateStats(){
+  if(!R) return;
+  $('#sAvg').textContent=cpm(R.correct,R.time);
+  $('#sAcc').textContent=(R.chars?Math.round(R.correct/R.chars*100):100)+'%';
+  $('#sProg').textContent=`${Math.min(R.idx,R.items.length)}/${R.items.length}`;
+  if(!lineStart) $('#sCpm').textContent=0;
+}
+function renderResult(){
+  stopLive();
+  const avg=cpm(R.correct,R.time), acc=R.chars?Math.round(R.correct/R.chars*100):100;
+  let isNew=false;
+  if(avg>best.cpm&&R.time>5&&acc>=80){best.cpm=avg;saveBest();isNew=true}
+  const m=Math.floor(R.time/60), s=Math.round(R.time%60);
+  $('#practiceStage').innerHTML=`<div class="result">
+    <h2>${R.items.length}문제 끝! ${acc>=95?'아주 정확했어요.':acc>=85?'좋아요, 틀린 것만 한 번 더 해 볼까요?':'틀린 명령어를 천천히 다시 쳐 보세요.'}</h2>
+    <div class="result-nums">
+      <div><b>${avg}</b><span>평균 타수 (타/분)${isNew?'<span class="new">최고 기록</span>':''}</span></div>
+      <div><b>${acc}%</b><span>정확도</span></div>
+      <div><b>${m?m+'분 ':''}${s}초</b><span>입력한 시간</span></div>
+    </div>
+    ${R.misses.length?`<div><h3 style="font-size:.8rem;letter-spacing:.06em;color:var(--muted);margin:0 0 8px">틀리거나 건너뛴 명령어 ${R.misses.length}개</h3><ul class="miss-list">${R.misses.map(x=>`<li><code>${esc(x.item.t)}</code>${x.typed.some((y,i)=>y!==x.item.t.split('\n')[i])?`<div class="d">내가 친 것: <code class="you">${esc(x.typed.join(' / '))}</code></div>`:''}<div class="d">${esc(x.item.d)}</div></li>`).join('')}</ul></div>`:'<p class="note">틀린 명령어가 하나도 없어요.</p>'}
+    <div class="row"><button class="btn pri" id="btnAgain">새 문제로 다시</button>${R.misses.length?'<button class="btn" id="btnRetry">틀린 것만 다시</button>':''}</div>
+  </div>`;
+  $('#meaningBox').hidden=true; $('#nextBox').hidden=true;
+  $('#sBest').textContent=best.cpm; $('#sProg').textContent=`${R.items.length}/${R.items.length}`;
+  $('#sAvg').textContent=avg; $('#sCpm').textContent=0;
+  $('#btnAgain').onclick=()=>{newRound();focusTyping()};
+  const rt=$('#btnRetry'); if(rt) rt.onclick=()=>{newRound(shuffle(R.misses.map(x=>x.item)));focusTyping()};
+}
+function focusTyping(){const i=$('#typeIn');if(i) i.focus({preventScroll:true})}
+$('#btnSkip').onclick=()=>{skipItem();};
+$('#btnRestart').onclick=()=>{newRound();focusTyping()};
+$('#optMeaning').checked=settings.meaning!==false;
+$('#optMeaning').onchange=e=>{settings.meaning=e.target.checked;saveSettings();if(R&&R.idx<R.items.length) $('#meaningBox').hidden=!settings.meaning};
+document.addEventListener('click',e=>{const g=e.target.closest('[data-goto]');if(g) showView(g.dataset.goto)});
+
+/* ---------- acid rain ---------- */
+const field=$('#field'), rainIn=$('#rainIn');
+const G={running:false,paused:false,words:[],score:0,level:1,lives:5,hits:0,last:0,acc:0,freeze:0,pool:[]};
+const MAX_LIVES=5;
+function rainPool(){
+  const lv=Math.min(settings.lv,2);
+  let p=pool(settings.cat,lv).filter(x=>!x.t.includes('\n')&&x.t.length<=30);
+  if(p.length<4) p=[...pool(settings.cat,1),...pool(settings.cat,2)].filter(x=>!x.t.includes('\n')&&x.t.length<=30);
+  return p;
+}
+function updateRainNote(){
+  const p=rainPool();
+  const lvTxt=settings.lv===3?'고급은 너무 길어서 산성비에서는 중급 명령어로 내려와요.':`${LV_NAME[settings.lv]} 용어 ${p.length}개가 내려와요.`;
+  $('#rainNote').textContent=p.length?lvTxt:'이 분류에는 산성비에 쓸 용어가 없어요. 용어 관리에서 추가해 주세요.';
+  $('#btnRain').disabled=!p.length;
+}
+function renderLives(){$('#rLives').innerHTML=Array.from({length:MAX_LIVES},(_,i)=>`<i class="${i<G.lives?'':'off'}"></i>`).join('')}
+function renderRainStats(){$('#rScore').textContent=G.score;$('#rLevel').textContent=G.level;$('#rBest').textContent=best.rain;renderLives()}
+function spawnMs(){return Math.max(650,2300-G.level*170)}
+function speed(){return 26+G.level*7}
+function rainStart(){
+  G.pool=rainPool(); if(!G.pool.length) return;
+  rainStop(false);
+  Object.assign(G,{running:true,paused:false,words:[],score:0,level:1,lives:MAX_LIVES,hits:0,last:performance.now(),acc:spawnMs(),freeze:0});
+  $('#rainOverlay').hidden=true; $('#btnPause').disabled=false; $('#btnPause').textContent='일시정지';
+  renderRainStats(); rainIn.value=''; rainIn.focus({preventScroll:true});
+  requestAnimationFrame(tick);
+}
+function rainStop(showStart){
+  G.running=false; G.words.forEach(w=>w.el.remove()); G.words=[];
+  if(showStart){
+    $('#ovTitle').textContent='산성비';
+    $('#ovText').textContent='떨어지는 명령어를 바닥에 닿기 전에 입력하고 Enter를 누르세요. 바닥에 닿으면 생명이 하나 줄어요. 10개를 맞힐 때마다 빨라져요.';
+    $('#btnRain').textContent='시작하기'; $('#rainOverlay').hidden=false; $('#btnPause').disabled=true;
+    G.score=0;G.level=1;G.lives=MAX_LIVES;renderRainStats();
+  }
+}
+function spawn(){
+  const onScreen=new Set(G.words.map(w=>w.text));
+  let cand=G.pool.filter(x=>!onScreen.has(x.t)); if(!cand.length) return;
+  const it=cand[Math.floor(Math.random()*cand.length)];
+  const el=document.createElement('div'); el.className='drop'; el.textContent=it.t;
+  const r=Math.random(); let kind='';
+  if(r<0.06){kind='gold';el.classList.add('gold')} else if(r<0.12){kind='ice';el.classList.add('ice')}
+  field.appendChild(el);
+  const W=field.clientWidth, w=el.offsetWidth, h=el.offsetHeight;
+  const x=Math.max(6,Math.random()*Math.max(1,W-w-12));
+  const word={el,text:it.t,x,y:-h,h,v:speed()*(0.85+Math.random()*0.3),kind};
+  el.style.transform=`translate(${x}px,${word.y}px)`;
+  G.words.push(word);
+}
+function tick(ts){
+  if(!G.running) return;
+  const dt=Math.min(0.05,Math.max(0,(ts-G.last)/1000)); G.last=ts;
+  if(!G.paused){
+    const frozen=ts<G.freeze;
+    if(!frozen){G.acc+=dt*1000; if(G.acc>=spawnMs()){G.acc=0;spawn()}}
+    const floor=field.clientHeight-30;
+    for(const w of G.words.slice()){
+      if(!frozen) w.y+=w.v*dt;
+      w.el.style.transform=`translate(${w.x}px,${w.y}px)`;
+      if(w.y+w.h>=floor) miss(w);
+      if(!G.running) return;
+    }
+  }
+  requestAnimationFrame(tick);
+}
+function removeWord(w,pop){
+  G.words=G.words.filter(x=>x!==w);
+  if(pop){w.el.classList.add('pop');w.el.style.transform=`translate(${w.x}px,${w.y-24}px) scale(1.15)`;setTimeout(()=>w.el.remove(),260)} else w.el.remove();
+}
+function miss(w){
+  removeWord(w,false); G.lives--; renderLives();
+  field.classList.add('hit'); setTimeout(()=>field.classList.remove('hit'),220);
+  if(G.lives<=0) gameOver();
+}
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;field.appendChild(d);setTimeout(()=>d.remove(),1150)}
+function hitWord(w){
+  removeWord(w,true); G.hits++;
+  G.score+=w.text.length*10+G.level*5;
+  if(w.kind==='gold'){const n=G.words.length;G.words.slice().forEach(x=>{G.score+=x.text.length*5;removeWord(x,true)});toast(n?`싹 정리! +${n}개`:'싹 정리!')}
+  if(w.kind==='ice'){G.freeze=performance.now()+3000;toast('3초 멈춤')}
+  if(G.hits%10===0){G.level++;toast(`레벨 ${G.level}`)}
+  renderRainStats();
+}
+function gameOver(){
+  G.running=false;
+  const isNew=G.score>best.rain; if(isNew){best.rain=G.score;saveBest()}
+  $('#ovTitle').textContent=isNew?'새 최고 점수!':'게임 끝';
+  $('#ovText').textContent=`점수 ${G.score}점 · 레벨 ${G.level} · 맞힌 명령어 ${G.hits}개`;
+  $('#btnRain').textContent='다시 하기'; $('#rainOverlay').hidden=false; $('#btnPause').disabled=true;
+  setTimeout(()=>{G.words.forEach(w=>w.el.remove());G.words=[]},400);
+  renderRainStats();
+}
+function setPaused(p){
+  if(!G.running) return; G.paused=p;
+  $('#btnPause').textContent=p?'계속하기':'일시정지';
+  if(!p){G.last=performance.now();rainIn.focus({preventScroll:true})}
+}
+$('#btnRain').onclick=rainStart;
+$('#btnPause').onclick=()=>setPaused(!G.paused);
+rainIn.addEventListener('input',()=>{
+  $('#imeWarn2').hidden=!hasHangul(rainIn.value);
+  const v=rainIn.value;
+  G.words.forEach(w=>w.el.classList.toggle('match',!!v&&w.text.startsWith(v)));
+});
+rainIn.addEventListener('keydown',e=>{
+  if(e.isComposing) return;
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const v=rainIn.value.trim(); if(!v||!G.running||G.paused){return}
+    const hits=G.words.filter(w=>w.text===v).sort((a,b)=>b.y-a.y);
+    if(hits.length) hitWord(hits[0]);
+    else{const wr=$('#rainInputWrap');wr.classList.remove('shake');void wr.offsetWidth;wr.classList.add('shake')}
+    rainIn.value=''; G.words.forEach(w=>w.el.classList.remove('match')); $('#imeWarn2').hidden=true;
+  } else if(e.key==='Escape'){e.preventDefault();setPaused(!G.paused)}
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&G.running&&!G.paused) setPaused(true)});
+
+/* ---------- manage ---------- */
+function catOptions(sel){
+  return allCats().map(c=>`<option value="${esc(c.id)}"${c.id===sel?' selected':''}>${esc(c.name)}</option>`).join('');
+}
+function flash(id,text,err){const m=$(id);m.textContent=text;m.classList.toggle('err',!!err);clearTimeout(m._t);m._t=setTimeout(()=>{m.textContent=''},3500)}
+function renderManage(){
+  const sel=settings.cat==='all'?'ios':settings.cat;
+  $('#addCat').innerHTML=catOptions($('#addCat').value||sel);
+  $('#bulkCat').innerHTML=catOptions($('#bulkCat').value||sel);
+  const f=$('#listFilter').value||'all';
+  $('#listFilter').innerHTML=`<option value="all">전체</option>`+catOptions(f);
+  $('#listFilter').value=f;
+  $('#catList').innerHTML=allCats().map(c=>{
+    const n=itemsOf(c.id).length, mine=custom.items.filter(x=>x.cat===c.id).length;
+    return `<li><span class="sw" style="width:10px;height:10px;border-radius:2px;background:${esc(c.color)}"></span><span class="nm">${esc(c.name)} ${c.builtin?'<span class="tag-built">기본</span>':''}</span><span class="ct">${n}개${c.builtin&&mine?` (내가 넣은 ${mine})`:''}</span>${c.builtin?'':`<button class="btn sm danger" data-delcat="${esc(c.id)}">삭제</button>`}</li>`;
+  }).join('');
+  const list=custom.items.filter(x=>f==='all'||x.cat===f);
+  $('#termList').innerHTML=list.length?list.slice().reverse().map(x=>{
+    const c=catById(x.cat);
+    return `<li><span class="lvb">${LV_NAME[x.lv]}</span><div class="body"><code>${esc(x.t)}</code><div class="d">${esc(c?c.name:'')}${x.d?' · '+esc(x.d):''}</div></div><button class="btn sm danger" data-delitem="${esc(x.id)}">삭제</button></li>`;
+  }).join(''):`<li><span class="note">아직 직접 넣은 용어가 없어요. 위에서 추가하면 여기에 모여요.</span></li>`;
+}
+$('#btnAdd').onclick=()=>{
+  const t=$('#addText').value.split('\n').map(s=>s.trim()).filter(Boolean).join('\n');
+  if(!t) return flash('#addMsg','명령어를 입력해 주세요.',true);
+  if(hasHangul(t)) return flash('#addMsg','명령어에 한글이 들어 있어요. 영타 연습용이라 영문만 넣어 주세요.',true);
+  custom.items.push({id:uid(),cat:$('#addCat').value,lv:+$('#addLv').value,t,d:$('#addDesc').value.trim()});
+  saveCustom(); $('#addText').value=''; $('#addDesc').value='';
+  flash('#addMsg','추가했어요.'); renderManage(); renderChips();
+};
+$('#btnBulk').onclick=()=>{
+  const cat=$('#bulkCat').value, lv=+$('#bulkLv').value; let n=0, skip=0;
+  $('#bulkText').value.split('\n').forEach(line=>{
+    line=line.trim(); if(!line) return;
+    const i=line.indexOf(' :: ');
+    const t=(i>=0?line.slice(0,i):line).trim(), d=i>=0?line.slice(i+4).trim():'';
+    if(!t||hasHangul(t)){skip++;return}
+    custom.items.push({id:uid(),cat,lv,t,d}); n++;
+  });
+  if(!n) return flash('#bulkMsg','추가할 줄이 없어요. 한 줄에 하나씩 적어 주세요.',true);
+  saveCustom(); $('#bulkText').value='';
+  flash('#bulkMsg',`${n}개 추가했어요.${skip?` (한글이 든 ${skip}줄은 뺐어요)`:''}`); renderManage(); renderChips();
+};
+$('#btnNewCat').onclick=()=>{
+  const name=$('#newCat').value.trim();
+  if(!name) return flash('#catMsg','분류 이름을 입력해 주세요.',true);
+  if(allCats().some(c=>c.name.toLowerCase()===name.toLowerCase())) return flash('#catMsg','같은 이름의 분류가 이미 있어요.',true);
+  const id='c_'+uid();
+  custom.cats.push({id,name,color:CUSTOM_COLORS[custom.cats.length%CUSTOM_COLORS.length]});
+  saveCustom(); $('#newCat').value='';
+  $('#addCat').value=''; $('#bulkCat').value='';
+  renderManage(); $('#addCat').value=id; $('#bulkCat').value=id;
+  flash('#catMsg',`'${name}' 분류를 만들었어요. 이제 용어를 추가해 보세요.`); renderChips();
+};
+$('#view-manage').addEventListener('click',e=>{
+  const dc=e.target.closest('[data-delcat]'), di=e.target.closest('[data-delitem]');
+  const confirmBtn=(b,fn)=>{ if(b.dataset.armed){fn();return} b.dataset.armed='1'; b.textContent='한 번 더 누르면 삭제'; setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='삭제'}},3000) };
+  if(dc) confirmBtn(dc,()=>{const id=dc.dataset.delcat;custom.cats=custom.cats.filter(c=>c.id!==id);custom.items=custom.items.filter(x=>x.cat!==id);if(settings.cat===id){settings.cat='ios';saveSettings()}saveCustom();renderManage();renderChips()});
+  if(di) confirmBtn(di,()=>{custom.items=custom.items.filter(x=>x.id!==di.dataset.delitem);saveCustom();renderManage();renderChips()});
+});
+$('#listFilter').onchange=renderManage;
+$('#btnExport').onclick=()=>{
+  const txt=JSON.stringify({app:'it-typer',v:1,...custom});
+  const ta=$('#backupText'); ta.value=txt;
+  const fallback=()=>{ta.focus();ta.select();flash('#backupMsg','선택해 두었어요. Ctrl+C로 복사하세요.')};
+  try{navigator.clipboard.writeText(txt).then(()=>flash('#backupMsg','복사했어요. 메모장 같은 곳에 붙여넣어 보관하세요.'),fallback)}catch(e){fallback()}
+};
+$('#btnImport').onclick=()=>{
+  try{
+    const o=JSON.parse($('#backupText').value);
+    if(!Array.isArray(o.cats)||!Array.isArray(o.items)) throw 0;
+    let nc=0,ni=0;
+    o.cats.forEach(c=>{if(c&&c.id&&c.name&&!custom.cats.some(x=>x.id===c.id)){custom.cats.push({id:String(c.id),name:String(c.name),color:c.color});nc++}});
+    o.items.forEach(x=>{if(x&&x.t&&x.cat&&!custom.items.some(y=>y.id===x.id)){custom.items.push({id:x.id||uid(),cat:String(x.cat),lv:[1,2,3].includes(+x.lv)?+x.lv:2,t:String(x.t),d:String(x.d||'')});ni++}});
+    saveCustom(); renderManage(); renderChips();
+    flash('#backupMsg',`분류 ${nc}개, 용어 ${ni}개를 가져왔어요.`);
+  }catch(e){flash('#backupMsg','백업 내용을 읽지 못했어요. 내보내기로 만든 글 전체를 그대로 붙여넣어 주세요.',true)}
+};
+
+/* ---------- views ---------- */
+let view='practice';
+function showView(v){
+  view=v;
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.view===v)));
+  ['practice','rain','manage'].forEach(n=>{const el=$('#view-'+n);el.hidden=n!==v;if(n===v) el.style.display='flex'});
+  $('#pickBar').hidden=v==='manage';
+  if(v!=='rain'&&G.running&&!G.paused) setPaused(true);
+  if(v==='practice'){ if(!R) newRound(); else if(R.idx<R.items.length) renderPractice(); focusTyping(); }
+  if(v==='rain'){ updateRainNote(); renderRainStats(); }
+  if(v==='manage') renderManage();
+}
+document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b) showView(b.dataset.view)});
+
+renderChips();
+newRound();
+renderRainStats();
+showView('practice');
+</script>
+</body>
+</html>
