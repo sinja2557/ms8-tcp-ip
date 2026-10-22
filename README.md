@@ -3,6 +3,9 @@
 - 경기인력개발원 Microsoft Cyber Security 8 회차 / TCP-IP
 - TCP/IP, Cisco Packet Tracer, Python(Google Colab), etc..
 
+<img width="792" height="349" alt="image" src="https://github.com/user-attachments/assets/8cfda1df-7e4b-4654-bb86-44e672db3e44" />
+
+
 # 2026-10-19
 - 실물 장비 Test (PC1 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC3)
 - L3 ↔ L2 SVI | L3 ↔ L3 static routing
