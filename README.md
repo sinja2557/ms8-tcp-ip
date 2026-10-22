@@ -3,7 +3,8 @@
 - 경기인력개발원 Microsoft Cyber Security 8 회차 / TCP-IP
 - TCP/IP, Cisco Packet Tracer, Python(Google Colab), etc..
 
-<img width="812" height="327" alt="image" src="https://github.com/user-attachments/assets/976e9ea4-3eef-4fcc-be62-f15bf5c6b717" />
+<img width="810" height="321" alt="image" src="https://github.com/user-attachments/assets/bad44cc9-e869-4107-858a-ce5fdcb933fc" />
+
 
 
 
