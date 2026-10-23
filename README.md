@@ -9,14 +9,20 @@
 
 
 # 2026-10-19
-- 실물 장비 Test (PC1 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC3)
+- 실물 장비 Test (PC9 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC10)
 - L3 ↔ L2 SVI | L3 ↔ L3 static routing
 - PC1 : 192.168.10.10 | PC3 : 192.168.30.10
 - MLS1 : 172.16.0.1 | MLS2 : 172.16.0.2
 
 # 2026-10-20
-- 실물 장비 Test (PC1 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC4)
+- 실물 장비 Test (PC19 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC20)
 - L3 ↔ L2 SVI | L3 ↔ L3 static routing → RIP
 - PC1 : 192.168.10.10 | PC4 : 192.168.40.10
 - MLS1 : 172.16.0.1 | MLS2 : 172.16.0.2
+
+# 2026-10-22
+- 실물 장비 Test (PC11 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC12)
+- L3 ↔ L2 SVI | L3 ↔ L3 static routing
+- PC1 : 192.168.10.10 | PC4 : 192.168.40.253
+- MLS1 : 172.16.0.10 | MLS2 : 172.16.0.2
 
