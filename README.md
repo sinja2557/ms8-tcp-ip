@@ -28,4 +28,4 @@
 
 
 - python socket 통신
-
+- 1 (Server):1 (PC) , 1 (Server):N (PCs), Thread, Queue
