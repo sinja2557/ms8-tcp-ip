@@ -27,7 +27,7 @@
 - MLS1 : 172.16.0.10 | MLS2 : 172.16.0.2
 
 # 2026-10-23 (48일차)
-- <img width="896" height="254" alt="image" src="https://github.com/user-attachments/assets/e6ccf266-e73b-4331-a2e3-0ddcb9146501" />
+<img width="896" height="254" alt="image" src="https://github.com/user-attachments/assets/e6ccf266-e73b-4331-a2e3-0ddcb9146501" />
 
 
 - python socket 통신
