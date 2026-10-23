@@ -12,19 +12,21 @@ def handle(conn, addr):
     while True:
         try:
             data = conn.recv(1024)
-        
+
         except OSError:
             break
 
         if not data:
             break
 
-        text = f"[{addr[[0]]}:{addr[1]}] {data.decode()}"
+        text = f"[{addr[0]}:{addr[1]}] {data.decode()}"
         print(text)
+
         for c in clients:
             if c != conn:
                 try:
                     c.send(text.encode())
+
                 except OSError:
                     pass
 
