@@ -2,7 +2,7 @@ import socket
 import threading
             
             # localhost : Private IP
-SERVER_IP = "10.10.34.10" 
+SERVER_IP = "10.10.34.4" 
 SERVER_PORT = 50005
 
 def receive():
