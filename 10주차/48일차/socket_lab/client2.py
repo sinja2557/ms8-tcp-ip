@@ -1,6 +1,6 @@
 import socket
 
-SERVER_IP = "10.10.34.4" # localhost
+SERVER_IP = "127.0.0.1" # localhost
 SERVER_PORT = 50005
 
                               # Ipv6 AF_INET6  | Unix AF_UNIX
