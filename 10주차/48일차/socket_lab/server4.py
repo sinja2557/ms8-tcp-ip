@@ -7,7 +7,7 @@ SERVER_PORT = 50005
 clients = []
 
 def handle(conn, addr):
-    print(addr, "입장 (현재", len(clients), "명")
+    print(addr, "입장 (현재", len(clients), "명)\n")
     
     while True:
         try:
@@ -32,13 +32,13 @@ def handle(conn, addr):
 
     clients.remove(conn)
     conn.close()
-    print(addr, "퇴장 (현재", len(clients), "명")
+    print(addr, "퇴장 (현재", len(clients), "명)\n")
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((SERVER_IP, SERVER_PORT))
 server.listen()
-print("Chat server started - wating connecting...")
+print("Chat server started - wating connecting...\n")
 
 while True:
     conn, addr = server.accept()

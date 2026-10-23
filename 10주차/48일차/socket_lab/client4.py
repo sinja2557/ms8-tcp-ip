@@ -1,7 +1,8 @@
 import socket
 import threading
-
-SERVER_IP = "127.0.0.1" # localhost
+            
+            # localhost : loopback
+SERVER_IP = "localhost" 
 SERVER_PORT = 50005
 
 def receive():
@@ -13,7 +14,7 @@ def receive():
             break
 
         if not data:
-            print("Disconnected to server...")
+            print("Disconnected to server...\n")
             break
         print(data.decode())
 
@@ -23,12 +24,12 @@ def receive():
                               # Ipv4 , TCP
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((SERVER_IP, SERVER_PORT)) # IP, Port
-print("접속 완료. \n접속 해제 : q")
+print("접속 완료. \n접속 해제 입력: q\n")
 
 threading.Thread(target=receive, daemon=True).start()
 
 while True:
-    msg = input("Client: ")
+    msg = input("\nSend to msg: ")
     if msg == "q":
         break
 
