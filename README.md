@@ -5,6 +5,7 @@
 
 # 2026-10-19
 <img width="810" height="321" alt="image" src="https://github.com/user-attachments/assets/bad44cc9-e869-4107-858a-ce5fdcb933fc" />
+
 - 실물 장비 Test (PC9 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC10)
 - L3 ↔ L2 SVI | L3 ↔ L3 static routing
 - PC1 : 192.168.10.10 | PC3 : 192.168.30.10
