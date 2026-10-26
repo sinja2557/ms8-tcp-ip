@@ -1,40 +1,142 @@
-# ms8-tcp-ip (37일차 ~)
-- 2026-10-12 ~ 2026-10-30 next class 클라우드기반 취약점
-- 경기인력개발원 Microsoft Cyber Security 8 회차 / TCP-IP
-- TCP/IP, Cisco Packet Tracer, Python(Google Colab), etc..
+# MS8 TCP/IP
 
-# 2026-10-19 (44일차)
+경기인력개발원 Microsoft Cyber Security 8회차 TCP/IP 학습 저장소입니다.
+
+TCP/IP 네트워크 구조부터 Cisco Packet Tracer, 실물 네트워크 장비, 라우팅, Python 소켓 프로그래밍까지 네트워크 통신과 관련된 학습 자료 및 실습 기록을 정리합니다.
+
+## 📚 학습 과정
+
+- **학습 기간:** 2026-10-12 ~ 2026-10-30
+- **교육 과정:** 경기인력개발원 Microsoft Cyber Security 8회차
+- **주요 학습 분야:** TCP/IP, 네트워크 장비, 라우팅, Python 소켓 통신
+- **주요 학습 도구:** Cisco Packet Tracer, Python, Google Colab, 실물 L2/L3 스위치
+- **다음 학습 주제:** 클라우드 기반 취약점
+
+## 🗂️ 학습 목차
+
+| 순서 | 학습 자료 | 주요 내용 |
+|---|---|---|
+| 1 | [9주차](./9주차/) | TCP/IP 및 네트워크 관련 학습 자료 |
+| 2 | [10주차](./10주차/) | 네트워크 장비 실습 및 Python 통신 관련 자료 |
+| 3 | [11주차 49일차](./11주차/49일차/) | CSAP 관련 학습 자료 |
+
+> 각 폴더의 세부 학습 내용은 해당 폴더에서 확인할 수 있습니다. 실제 실습 기록은 아래 날짜별 학습 내역에서도 확인할 수 있습니다.
+
+## 🧭 권장 학습 순서
+
+### 1. 네트워크 장비 및 통신 구조
+
+- PC, L2 스위치, L3 스위치로 구성된 네트워크 구조 이해
+- L2 스위치와 L3 스위치의 역할 구분
+- 네트워크 장비 간 연결 구조 및 IP 주소 구성 확인
+- 실물 네트워크 장비를 활용한 통신 테스트
+
+### 2. SVI 및 정적 라우팅
+
+- L2 스위치와 L3 스위치 간 SVI 구성
+- L3 스위치 간 정적 라우팅(Static Routing) 구성
+- 서로 다른 IP 네트워크 간 통신 테스트
+- 라우팅 설정에 따른 통신 결과 확인
+
+### 3. RIP 라우팅
+
+- 정적 라우팅 환경에서 RIP로 학습 범위 확장
+- L3 스위치 간 라우팅 설정 및 통신 테스트
+- 네트워크 구성과 IP 주소 변경에 따른 통신 확인
+
+### 4. Python 소켓 프로그래밍
+
+- Python을 이용한 소켓 통신
+- 1:1 서버·클라이언트 통신
+- 1:N 서버·클라이언트 통신
+- Thread를 활용한 동시 처리
+- Queue를 활용한 데이터 전달 및 작업 처리
+
+### 5. 개인 실습 환경 구성
+
+- L3 스위치(MLS1)와 L2 스위치(SW1)를 활용한 개인 실습 환경 구성
+- 네트워크 장비 설정 및 통신 테스트
+- 기존 실습 내용을 직접 반복하며 네트워크 구성 능력 향상
+
+### 6. 보안 관련 학습
+
+- CSAP 관련 학습
+- 네트워크 기반 보안 실습
+- 클라우드 기반 취약점 학습으로 범위 확장
+
+## 📅 날짜별 학습 기록
+
+### 2026-10-19 (44일차)
+
+**학습 주제: 실물 네트워크 장비 테스트 및 정적 라우팅**
+
 <img width="810" height="321" alt="image" src="https://github.com/user-attachments/assets/bad44cc9-e869-4107-858a-ce5fdcb933fc" />
 
-- 실물 장비 Test (PC9 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC10)
-- L3 ↔ L2 SVI | L3 ↔ L3 static routing
-- PC1 : 192.168.10.10 | PC3 : 192.168.30.10
-- MLS1 : 172.16.0.1 | MLS2 : 172.16.0.2
+- 실물 장비 테스트: `PC9 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC10`
+- L3 ↔ L2: SVI
+- L3 ↔ L3: Static Routing
+- IP 주소 및 장비 설정 기록
+  - PC1: `192.168.10.10`
+  - PC3: `192.168.30.10`
+  - MLS1: `172.16.0.1`
+  - MLS2: `172.16.0.2`
 
-# 2026-10-20 (45일차)
-- 실물 장비 Test (PC19 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC20)
-- L3 ↔ L2 SVI | L3 ↔ L3 static routing → RIP
-- PC1 : 192.168.10.10 | PC4 : 192.168.40.10
-- MLS1 : 172.16.0.1 | MLS2 : 172.16.0.2
+### 2026-10-20 (45일차)
 
-# 2026-10-22 (47일차)
-- 실물 장비 Test (PC11 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC12)
-- L3 ↔ L2 SVI | L3 ↔ L3 static routing
-- PC1 : 192.168.10.10 | PC4 : 192.168.40.253
-- MLS1 : 172.16.0.10 | MLS2 : 172.16.0.2
+**학습 주제: 정적 라우팅에서 RIP로 확장**
 
-# 2026-10-23 (48일차)
+- 실물 장비 테스트: `PC19 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC20`
+- L3 ↔ L2: SVI
+- L3 ↔ L3: Static Routing → RIP
+- IP 주소 및 장비 설정 기록
+  - PC1: `192.168.10.10`
+  - PC4: `192.168.40.10`
+  - MLS1: `172.16.0.1`
+  - MLS2: `172.16.0.2`
+
+### 2026-10-22 (47일차)
+
+**학습 주제: 실물 장비 구성 및 정적 라우팅 테스트**
+
+- 실물 장비 테스트: `PC11 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC12`
+- L3 ↔ L2: SVI
+- L3 ↔ L3: Static Routing
+- IP 주소 및 장비 설정 기록
+  - PC1: `192.168.10.10`
+  - PC4: `192.168.40.253`
+  - MLS1: `172.16.0.10`
+  - MLS2: `172.16.0.2`
+
+### 2026-10-23 (48일차)
+
+**학습 주제: Python 소켓 통신**
+
 <img width="896" height="254" alt="image" src="https://github.com/user-attachments/assets/e6ccf266-e73b-4331-a2e3-0ddcb9146501" />
 
 
-- python socket 통신
-- 1 (Server):1 (PC) , 1 (Server):N (PCs), Thread, Queue
+- Python Socket 통신
+- 1:1 통신: 1 Server : 1 PC
+- 1:N 통신: 1 Server : N PCs
+- Thread를 활용한 동시 처리
+- Queue를 활용한 데이터 처리
 
-# 2026-10-25 (주말 공부)
+### 2026-10-25 (주말 공부)
+
+**학습 주제: 개인 실습용 네트워크 장비 구성**
+
 <img width="761" height="870" alt="image" src="https://github.com/user-attachments/assets/8a0fd10b-0c0f-4750-acf3-8350a67feff6" />
 
-- 1인 실습용 장비 세팅 (L3 Switch [Router] MLS1, L2 Switch SW1)
-- Google Docs : https://shorturl.at/XCbo9
+- 1인 실습용 장비 세팅
+- L3 Switch: `MLS1` (Router 역할)
+- L2 Switch: `SW1`
+- 참고 자료: [Google Docs - 개인 네트워크 장비 실습](https://shorturl.at/XCbo9)
 
-# 2026-10-26 (49일차)
-- CSAP
+### 2026-10-26 (49일차)
+
+**학습 주제: CSAP**
+
+- CSAP 관련 학습
+
+## 🎯 학습 목표
+
+- TCP/IP 네트워크 통신 구조
