@@ -30,5 +30,10 @@
 - python socket 통신
 - 1 (Server):1 (PC) , 1 (Server):N (PCs), Thread, Queue
 
+# 2026-10-25 (주말 공부)
+<img width="761" height="870" alt="image" src="https://github.com/user-attachments/assets/8a0fd10b-0c0f-4750-acf3-8350a67feff6" />
+
+- 1인 실습용 장비 세팅 (L3 Switch [Router] MLS1, L2 Switch SW1)
+
 # 2026-10-26 (49일차)
 - CSAP
