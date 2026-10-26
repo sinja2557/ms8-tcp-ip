@@ -29,3 +29,6 @@
 
 - python socket 통신
 - 1 (Server):1 (PC) , 1 (Server):N (PCs), Thread, Queue
+
+# 2026-10-26 (49일차)
+- CSAP
