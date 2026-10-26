@@ -72,7 +72,7 @@ TCP/IP 네트워크 구조부터 Cisco Packet Tracer, 실물 네트워크 장비
 
 <img width="810" height="321" alt="image" src="https://github.com/user-attachments/assets/bad44cc9-e869-4107-858a-ce5fdcb933fc" />
 
-- 실물 장비 테스트: `PC9 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC10`
+- 실물 장비 테스트: `PC1 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC3`
 - L3 ↔ L2: SVI
 - L3 ↔ L3: Static Routing
 - IP 주소 및 장비 설정 기록
@@ -85,7 +85,7 @@ TCP/IP 네트워크 구조부터 Cisco Packet Tracer, 실물 네트워크 장비
 
 **학습 주제: 정적 라우팅에서 RIP로 확장**
 
-- 실물 장비 테스트: `PC19 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC20`
+- 실물 장비 테스트: `PC1 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC4`
 - L3 ↔ L2: SVI
 - L3 ↔ L3: Static Routing → RIP
 - IP 주소 및 장비 설정 기록
@@ -98,7 +98,7 @@ TCP/IP 네트워크 구조부터 Cisco Packet Tracer, 실물 네트워크 장비
 
 **학습 주제: 실물 장비 구성 및 정적 라우팅 테스트**
 
-- 실물 장비 테스트: `PC11 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC12`
+- 실물 장비 테스트: `PC1 - L2(SW1) - L3(MLS1) ↔ L3(MLS2) - L2(SW2) - PC4`
 - L3 ↔ L2: SVI
 - L3 ↔ L3: Static Routing
 - IP 주소 및 장비 설정 기록
